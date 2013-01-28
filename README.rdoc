@@ -3,3 +3,11 @@
 This app serves as a JSON API that receives an event URL as a query and returns a JSON list of ten related activities from that website.
 
 Simply attach ".../search?q=<YOUR-URL-HERE>" to enter a query and you'll get a response shortly.
+
+== She's alive!
+
+activityscraper.herokuapp.com
+
+For instance, a query would look like:
+
+activityscraper.herokuapp.com/search?q=<YOUR-URL-HERE>
