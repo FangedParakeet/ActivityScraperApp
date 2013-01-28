@@ -36,7 +36,12 @@ class ApplicationController < ActionController::Base
       main = get_main(url, "a", root)
       links = get_links(main, ".event-box", nil, root)
       return links
+      
+    else
+      return "Sorry, your event could not be identified!"
+      
     end
+    
   end
   
   def get_page url
