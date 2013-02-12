@@ -29,6 +29,11 @@ end
 gem 'jquery-rails'
 
 gem 'nokogiri'
+gem 'mechanize', '~> 2.5.1'
+gem 'hoe', '~> 3.0'
+gem 'minitest', '~> 2.11'
+gem 'rdoc', '~> 3.10'
+
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

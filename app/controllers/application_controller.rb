@@ -1,4 +1,5 @@
 require 'open-uri'
+require 'net/http'
 
 class ApplicationController < ActionController::Base
   protect_from_forgery
@@ -38,14 +39,126 @@ class ApplicationController < ActionController::Base
       return links
       
     else
-      return "Sorry, your event could not be identified!"
-      
+      find_more_activities url
     end
+    
+  end
+  
+  def find_more_activities url # Attempts to find root events page and collect links from here
+    agent = Mechanize.new # This gem runs with Nokogiri under the hood, but returns more information
+    looking = true
+    extension = ""
+    main = url
+    root = get_root(url)
+    searches = []
+    links = []
+    i = 0
+    
+    begin    
+      agent.get(url) # Searches the page for links that may be the main events page
+      agent.page.links.each do |link|
+        if link.text[/(Event|event|Activit|activit)/]
+          if link.href.include?("http")
+            unless searches.include?(link.href)
+              if is_valid(link.href)
+                searches << link.href
+              end
+            end
+          else
+            full_link = root + normalise_path(link.href)
+            unless links.include?(full_link)
+              if is_valid(full_link)
+                searches << full_link
+              end
+            end
+          end
+        end
+      end
+    rescue
+    end
+    
+    while looking # Finds the main events address via the URL
+      adds = main.reverse.partition("/")
+      adds.each { |add| add.reverse! }
+      if extension.empty?
+        extension = adds.first
+      else
+        extension = adds.first + "/" + extension
+      end
+      main = adds.last
+      looking = is_valid(main)
+    end
+    
+    searches << main
+    searches.sort_by! { |search| search.length }
+    searches.reverse!
+        
+    start = root.length + 1
+    finish = url.length
+    path = url[start..finish]
+    
+    options = path.split("/").reverse # Creates options for event keywords from original event URL
+    options << ""
+    
+    searches.each do |search| # Searches through potential events pages for URLs that match likely event keywords until 10 are found
+      if i < 10
+        begin
+          agent.get(search) # Uses Mechanize to load the page and searches for links that match the likely options
+        rescue
+          break
+        end
+        options.each do |option|
+          if agent.page && agent.page.links.present? && i < 10
+            agent.page.links.each do |link|
+              if i < 10
+                if link.href
+                  if link.href.include?(option)
+                    if link.href.include?("http")
+                      unless links.include?(link.href)
+                        if is_valid(link.href) # To check for valid URL
+                          links << link.href
+                          i += 1
+                        end
+                      end
+                    else
+                      full_link = root + normalise_path(link.href)
+                      unless links.include?(full_link)
+                        if is_valid(full_link)
+                          links << full_link
+                          i += 1
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    
+    return links
     
   end
   
   def get_page url
     Nokogiri::HTML(open(url))  # Nokogiri is the gem that will allow us to scrape the websites for activities
+  end
+  
+  def get_root url # Returns root url 
+    root = url
+    found = false
+    loop do
+      adds = root.reverse.partition("/")
+      adds.each { |elt| elt.reverse! }
+      unless adds.last == "http:/"
+        root = adds.last
+      else
+        break
+      end
+    end
+    return root
   end
   
   def get_main url, where, root # This will take us from a single event page to one displaying many activities: the root domain
@@ -87,6 +200,21 @@ class ApplicationController < ActionController::Base
       path.insert(0, "/")
     end
     return path
+  end
+  
+  def is_valid address
+    begin
+      url = URI.parse(address)
+      req = Net::HTTP.new(url.host, url.port)
+      res = req.request_head(url.path)
+      if res.code == "200"
+        return true
+      else
+        return false
+      end
+    rescue
+      return false
+    end
   end
       
       

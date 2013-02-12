@@ -2,7 +2,9 @@ class PagesController < ApplicationController
 
   def search
     url = params[:q]
-    @links = find_activities(url) #See ApplicationController
+    if url
+      @links = find_more_activities(url) #See ApplicationController
+    end
     respond_to do |format|
       format.json {render json: @links }
     end
