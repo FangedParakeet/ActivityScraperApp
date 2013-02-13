@@ -73,23 +73,11 @@ class ApplicationController < ActionController::Base
   
   
   def get_page url
-    Nokogiri::HTML(open(url))  # Nokogiri is the gem that will allow us to scrape the websites for activities
-  end
-  
-  
-  def get_root url # Returns root url 
-    root = url
-    found = false
-    loop do
-      adds = root.reverse.partition("/")
-      adds.each { |elt| elt.reverse! }
-      unless adds.last == "http:/"
-        root = adds.last
-      else
-        break
-      end
+    begin
+      Nokogiri::HTML(open(url))  # Nokogiri is the gem that will allow us to scrape the websites for activities
+    rescue
+      "Please restate your query."
     end
-    return root
   end
   
   
@@ -113,6 +101,22 @@ class ApplicationController < ActionController::Base
     
     return links
     
+  end
+  
+  
+  def get_root url # Returns root url 
+    root = url
+    found = false
+    loop do
+      adds = root.reverse.partition("/")
+      adds.each { |elt| elt.reverse! }
+      unless adds.last == "http:/"
+        root = adds.last
+      else
+        break
+      end
+    end
+    return root
   end
   
   
