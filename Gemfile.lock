@@ -45,8 +45,6 @@ GEM
     execjs (1.4.0)
       multi_json (~> 1.0)
     hike (1.2.1)
-    hoe (3.5.0)
-      rake (>= 0.8, < 11.0)
     i18n (0.6.1)
     journey (1.0.4)
     jquery-rails (2.2.0)
@@ -66,7 +64,6 @@ GEM
       ntlm-http (~> 0.1, >= 0.1.1)
       webrobots (~> 0.0, >= 0.0.9)
     mime-types (1.19)
-    minitest (2.12.1)
     multi_json (1.5.0)
     net-http-digest_auth (1.2.1)
     net-http-persistent (2.8)
@@ -132,14 +129,11 @@ PLATFORMS
 
 DEPENDENCIES
   coffee-rails (~> 3.2.1)
-  hoe (~> 3.0)
   jquery-rails
   mechanize (~> 2.5.1)
-  minitest (~> 2.11)
   nokogiri
   pg (= 0.12.2)
   rails (= 3.2.7)
-  rdoc (~> 3.10)
   sass-rails (~> 3.2.3)
   sqlite3
   thin
